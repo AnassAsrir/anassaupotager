@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import cultures from "../data/calendrier.json";
 import "../styles/Calendrier.css";
+import "../styles/Modal.css";
 
 // ==== Composants réutilisables ====
 const Header = ({ title }) => (
@@ -25,46 +26,75 @@ const MonthNav = ({ months, selectedMonth, onSelectMonth }) => (
 );
 
 const DayCell = ({ day, infos, onClick }) => {
-  // Regrouper par type d'action
-  const grouped = infos.reduce((acc, curr) => {
-    if (!acc[curr.action]) acc[curr.action] = [];
-    acc[curr.action].push(curr.nom);
-    return acc;
-  }, {});
-
   return (
     <div
       className={`calendar-day ${infos.length > 0 ? "has-event" : ""}`}
-      onClick={() => infos.length > 0 && onClick(grouped, day)}
+      onClick={() => infos.length > 0 && onClick(day, infos)}
     >
       {day && <div className="day-number">{day}</div>}
-      {Object.keys(grouped).map((action, idx) => (
-        <span
-          key={idx}
-          className={`event-badge ${action.replace(" ", "-").toLowerCase()}`}
-        >
-          {action}
-        </span>
-      ))}
+      {/* Affiche juste les types d'événements sur la case */}
+      {["Semis 🌱", "Plantation 🌿", "Récolte 🥕"].map((action, idx) =>
+        infos.some((i) => i.action === action) ? (
+          <span
+            key={idx}
+            className={`event-badge ${
+              action === "Semis 🌱"
+                ? "event-semis"
+                : action === "Plantation 🌿"
+                ? "event-plantation"
+                : "event-recolte"
+            }`}
+          >
+            {action}
+          </span>
+        ) : null
+      )}
     </div>
   );
 };
 
-const Modal = ({ day, data, onClose }) => (
-  <div className="modal-overlay" onClick={onClose}>
-    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-      <h2>Jour {day}</h2>
-      {Object.entries(data).map(([action, noms], idx) => (
-        <div key={idx} className="modal-item">
-          <strong>{action}</strong> : {noms.join(", ")}
+const Modal = ({ day, data, onClose }) => {
+  const actions = Object.keys(data);
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div
+        className="modal-content modal-grid"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
+          Jour {day}
+        </h2>
+        <div className="modal-columns">
+          {actions.map((action) => (
+            <div
+              key={action}
+              className={`modal-column ${
+                action === "Semis 🌱"
+                  ? "event-semis"
+                  : action === "Plantation 🌿"
+                  ? "event-plantation"
+                  : "event-recolte"
+              }`}
+            >
+              <h3>{action}</h3>
+              <ul>
+                {data[action].map((famille, idx) => (
+                  <li key={idx}>{famille}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-      ))}
-      <button onClick={onClose} className="close-btn">
-        Fermer
-      </button>
+        <div style={{ textAlign: "center", marginTop: "20px" }}>
+          <button onClick={onClose} className="close-btn">
+            Fermer
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ==== Calendrier principal ====
 export const Calendrier = () => {
@@ -121,7 +151,7 @@ export const Calendrier = () => {
                 default:
                   break;
               }
-              info.push({ nom: c["Nom / Variété"], action });
+              info.push({ nom: c["Famille"], action });
             }
           }
         }
@@ -144,6 +174,16 @@ export const Calendrier = () => {
       semaine = [];
     }
   }
+
+  const handleDayClick = (day, infos) => {
+    // Regrouper par action et supprimer doublons
+    const grouped = infos.reduce((acc, curr) => {
+      if (!acc[curr.action]) acc[curr.action] = [];
+      if (!acc[curr.action].includes(curr.nom)) acc[curr.action].push(curr.nom);
+      return acc;
+    }, {});
+    setModalData({ day, data: grouped });
+  };
 
   return (
     <div className="main-container">
@@ -174,7 +214,7 @@ export const Calendrier = () => {
                   key={idx}
                   day={jour}
                   infos={jour ? getJourInfo(jour) : []}
-                  onClick={(data, day) => setModalData({ day, data })}
+                  onClick={handleDayClick}
                 />
               ))}
             </div>
