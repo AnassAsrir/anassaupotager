@@ -1,5 +1,5 @@
-// src/models/Plante.js
-export class Plante {
+// Plante.js
+export default class Plante {
   constructor({
     famille,
     nomVariete,
@@ -8,35 +8,41 @@ export class Plante {
     plantationPleineTerre,
     semisDirect,
     dateRecolte,
-    arrosageNormal,
-    arrosageChaleur,
-    quantiteEau,
   }) {
-    this.famille = famille; // "Tomate"
-    this.nomVariete = nomVariete; // "Rose de Berne"
-    this.semisGodet = semisGodet; // "15 mars"
-    this.repiquageGodet = repiquageGodet; // "10 avril"
-    this.plantationPleineTerre = plantationPleineTerre; // "20 mai"
-    this.semisDirect = semisDirect; // ""
-    this.dateRecolte = dateRecolte; // "15 juillet - 15 octobre"
-    this.arrosageNormal = arrosageNormal; // "2-3 jours"
-    this.arrosageChaleur = arrosageChaleur; // "tous les jours"
-    this.quantiteEau = quantiteEau; // "1 arrosoir / pied / semaine"
+    this.famille = famille;
+    this.nomVariete = nomVariete;
+    this.semisGodet = semisGodet;
+    this.repiquageGodet = repiquageGodet;
+    this.plantationPleineTerre = plantationPleineTerre;
+    this.semisDirect = semisDirect;
+    this.dateRecolte = dateRecolte;
   }
 
-  // Méthode pour vérifier si un jour correspond à un semis ou récolte
-  actionsPourJour(jour, mois) {
-    const actions = [];
+  getEventsForMonth(mois) {
+    const events = [];
+    const types = [
+      { key: "semisGodet", label: "Semis 🌱" },
+      { key: "semisDirect", label: "Semis 🌱" },
+      { key: "repiquageGodet", label: "Plantation 🌿" },
+      { key: "plantationPleineTerre", label: "Plantation 🌿" },
+      { key: "dateRecolte", label: "Récolte 🥕" },
+    ];
 
-    if (this.semisGodet.includes(jour))
-      actions.push({ type: "Semis 🌱", date: this.semisGodet });
-    if (this.repiquageGodet.includes(jour))
-      actions.push({ type: "Repiquage 🌿", date: this.repiquageGodet });
-    if (this.plantationPleineTerre.includes(jour))
-      actions.push({ type: "Plantation 🌿", date: this.plantationPleineTerre });
-    if (this.dateRecolte.includes(jour))
-      actions.push({ type: "Récolte 🥕", date: this.dateRecolte });
+    types.forEach(({ key, label }) => {
+      const val = this[key];
+      if (!val) return;
 
-    return actions;
+      const regex = /(\d{1,2})\s+(\w+)/g;
+      let match;
+      while ((match = regex.exec(val)) !== null) {
+        const day = parseInt(match[1], 10);
+        const month = match[2].toLowerCase();
+        if (month === mois) {
+          events.push({ day, action: label, nom: this.nomVariete });
+        }
+      }
+    });
+
+    return events;
   }
 }
