@@ -146,7 +146,7 @@ export const Calendrier = () => {
   }
 
   return (
-    <div className="calendar-container">
+    <div className="main-container">
       <Header title="📅 Calendrier interactif" />
       <MonthNav
         months={moisNoms}
