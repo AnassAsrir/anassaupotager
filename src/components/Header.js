@@ -1,5 +1,13 @@
 import React from "react";
+import "../styles/Components.css";
 
-export default function Header({ title }) {
-  return <h1 style={{ textAlign: "center", color: "#2a7f32" }}>{title}</h1>;
+export class Header extends React.Component {
+  render() {
+    return (
+      <header className="header">
+        <h1>{this.props.title}</h1>
+        {this.props.subtitle && <p>{this.props.subtitle}</p>}
+      </header>
+    );
+  }
 }

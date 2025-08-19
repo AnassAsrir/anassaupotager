@@ -1,9 +1,9 @@
 // src/App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import Home from "./pages/Home";
+import { Home } from "./pages/Home";
 import Potager from "./pages/Potager";
-import Calendrier from "./pages/Calendrier";
+import { Calendrier } from "./pages/Calendrier";
 
 function App() {
   return (
