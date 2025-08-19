@@ -1,13 +1,17 @@
 // src/pages/Potager.js
 import React from "react";
+import { Header } from "../components/Header";
+import { Section } from "../components/Section";
 
-function Potager() {
-  return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>🥕 Mon Potager</h1>
-      <p>Ici tu pourras ajouter tes semis et suivre ton jardin 🌞</p>
-    </div>
-  );
+export class Potager extends React.Component {
+  render() {
+    return (
+      <div className="main-container">
+        <Header title="🥕 Mon Potager" />
+        <Section>
+          <p></p>
+        </Section>
+      </div>
+    );
+  }
 }
-
-export default Potager;
